@@ -4,10 +4,11 @@
 <h1>Posts</h1>
     {% for post in posts %}
     <h2>
-        <a class="title" href="{% url 'blog:post_detail' id=post.id %}">{{ post.title }}</a>
+        <a class="title" href="{{ post.get_absolute_url }}">{{ post.title }}</a>
     </h2>
     <p class="date">
         Published {{ post.publish }} by {{ post.author }}
     </p>
     {% endfor %}
+    {% include 'pagination.html' with page=page_obj %}
 {% endblock %}
