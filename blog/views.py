@@ -3,10 +3,37 @@ from django.http import HttpRequest, HttpResponse
 from django.core.paginator import Paginator
 from django.views.generic import ListView
 from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
 
 
 from blog.models import Post
-from blog.forms import EmailPostForm
+from blog.forms import EmailPostForm, CommentForm
+
+
+@require_POST
+def post_comment(request: HttpRequest, post_id: int) -> HttpResponse:
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        status=Post.Status.PUBLISHED,
+    )
+
+    comment = None
+    form = CommentForm(data=request.POST)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.save()
+
+    return render(
+        request,
+        "blog/post/comment.html",
+        {
+            "post": post,
+            "form": form,
+            "comment": comment,
+        },
+    )
 
 
 def post_share(request: HttpRequest, post_id: int) -> HttpResponse:
@@ -60,8 +87,14 @@ def post_detail(
         publish__month=month,
         publish__day=day,
     )
+
+    comments = post.comments.filter(active=True)
+
     return render(
         request,
         "blog/post/detail.html",
-        {"post": post},
+        {
+            "post": post,
+            "comments": comments,
+        },
     )
