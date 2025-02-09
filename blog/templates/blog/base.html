@@ -5,41 +5,303 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %} - My Blog</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/blog.css' %}" />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --text-color: #2c3e50;
+        --light-bg: #f8f9fa;
+      }
+
+      body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: var(--text-color);
+        background-color: var(--light-bg);
+        line-height: 1.6;
+      }
+
+      .navbar {
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 1rem 0;
+        transition: all 0.3s ease;
+      }
+
+      .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        transition: color 0.3s ease;
+      }
+
+      .navbar-brand:hover {
+        color: var(--secondary-color);
+      }
+
+      .nav-link {
+        font-weight: 500;
+        color: var(--text-color);
+        position: relative;
+        padding: 0.5rem 1rem;
+        margin: 0 0.2rem;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background-color: var(--secondary-color);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .nav-link:hover {
+        color: var(--secondary-color);
+      }
+
+      .hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s ease forwards;
+      }
+
+      .sidebar {
+        background-color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar:hover {
+        transform: translateY(-5px);
+      }
+
+      .sidebar h2 {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--secondary-color);
+      }
+
+      .footer {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2rem 0;
+        margin-top: 3rem;
+      }
+
+      .footer p {
+        margin: 0;
+        opacity: 0.8;
+      }
+
+      .social-links {
+        margin-top: 1rem;
+      }
+
+      .social-links a {
+        color: white;
+        margin: 0 0.5rem;
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+        display: inline-block;
+      }
+
+      .social-links a:hover {
+        transform: translateY(-3px);
+        color: var(--secondary-color);
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .content {
+        background-color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .hero {
+          padding: 2rem 0;
+        }
+        .sidebar {
+          margin-top: 2rem;
+        }
+      }
+    </style>
   </head>
   <body>
-    <header>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
-        <h1>My Blog</h1>
-      </div>
-    </header>
-
-    <nav>
-      <div class="container">
-        <ul>
-          <li><a href="{% url 'blog:post_list' %}">Home</a></li>
-          {% if user.is_authenticated %}
-          <li><a href="{% url 'admin:index' %}">Admin Panel</a></li>
-          {% endif %}
-        </ul>
+        <a class="navbar-brand" href="{% url 'blog:post_list' %}">
+          <i class="fas fa-pen-fancy me-2"></i>My Blog
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'blog:post_list' %}">
+                <i class="fas fa-home me-1"></i>Home
+              </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admin:index' %}">
+                <i class="fas fa-user-shield me-1"></i>Admin Panel
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <main class="container">
-      <div class="content">{% block content %}{% endblock %}</div>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div id="particles-js"></div>
+      <div class="container hero-content">
+        <h1>Welcome to My Blog</h1>
+        <p class="lead">Exploring ideas, sharing stories, and connecting with readers.</p>
+      </div>
+    </section>
 
-      <aside class="sidebar">
-        <div class="post">
-          <h2>About</h2>
-          <p>Welcome to my blog! Here I share my thoughts and experiences.</p>
+    <!-- Main Content -->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="content">
+            {% block content %}{% endblock %}
+          </div>
         </div>
-      </aside>
-    </main>
+        <div class="col-lg-4">
+          <aside class="sidebar">
+            <h2>About</h2>
+            <p>Welcome to my blog! Here I share my thoughts and experiences.</p>
+            <div class="social-links mt-4">
+              <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+              <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
 
-    <footer class="text-center mt-2">
-      <div class="container">
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container text-center">
         <p>&copy; {% now "Y" %} My Blog. All rights reserved.</p>
+        <div class="social-links">
+          <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
       </div>
     </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 80, density: { enable: true, value_area: 800 } },
+          color: { value: '#ffffff' },
+          shape: { type: 'circle' },
+          opacity: {
+            value: 0.5,
+            random: false,
+            animation: { enable: true, speed: 1, minimumValue: 0.1, sync: false }
+          },
+          size: {
+            value: 3,
+            random: true,
+            animation: { enable: true, speed: 2, minimumValue: 0.1, sync: false }
+          },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#ffffff',
+            opacity: 0.4,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            outModes: { default: 'bounce' },
+            attract: { enable: false, rotateX: 600, rotateY: 1200 }
+          }
+        },
+        interactivity: {
+          detectsOn: 'canvas',
+          events: {
+            onHover: { enable: true, mode: 'grab' },
+            onClick: { enable: true, mode: 'push' },
+            resize: true
+          },
+          modes: {
+            grab: { distance: 140, line_linked: { opacity: 1 } },
+            push: { quantity: 4 }
+          }
+        },
+        retina_detect: true
+      });
+    </script>
   </body>
 </html>

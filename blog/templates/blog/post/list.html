@@ -1,13 +1,207 @@
-{% extends 'blog/base.html' %} 
-{% block title %}Posts{% endblock %} 
+{% extends 'blog/base.html' %}
+{% block title %}Posts{% endblock %}
 {% block content %}
-<h1>Posts</h1>
-    {% for post in posts %}
-    <h2>
-        <a class="title" href="{% url 'blog:post_detail' id=post.id %}">{{ post.title }}</a>
-    </h2>
-    <p class="date">
-        Published {{ post.publish }} by {{ post.author }}
-    </p>
-    {% endfor %}
+<div class="container py-5 fade-in">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="display-4 mb-4 text-center slide-down">Latest Posts</h1>
+            <div class="post-list">
+                {% for post in posts %}
+                <article class="card mb-4 post-card hover-shadow animate-in" style="animation-delay: {{ forloop.counter }}00ms">
+                    <div class="card-body">
+                        <h2 class="card-title h3 mb-3">
+                            <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark link-hover">
+                                {{ post.title }}
+                            </a>
+                        </h2>
+                        <div class="d-flex align-items-center text-muted mb-3 meta-info">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span class="me-3">{{ post.author }}</span>
+                            <i class="far fa-calendar-alt me-2"></i>
+                            <span>{{ post.publish|date:"F j, Y" }}</span>
+                        </div>
+                        {% if post.body %}
+                        <p class="card-text text-muted content-fade">
+                            {{ post.body|truncatewords:30 }}
+                        </p>
+                        {% endif %}
+                        <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-animate">
+                            Read More <i class="fas fa-arrow-right ms-1 btn-icon"></i>
+                        </a>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="text-center py-5 fade-in">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3 bounce"></i>
+                    <p class="lead">No posts available yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-5 fade-in">
+                {% include 'pagination.html' with page=page_obj %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.slide-down {
+    animation: slideDown 0.8s ease-out forwards;
+}
+
+.animate-in {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.post-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+.post-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.link-hover {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.link-hover::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+}
+
+.link-hover:hover::after {
+    width: 100%;
+}
+
+.btn-animate {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.btn-animate:hover {
+    transform: translateX(5px);
+}
+
+.btn-animate .btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.btn-animate:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+.meta-info {
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.post-card:hover .meta-info {
+    opacity: 1;
+}
+
+.content-fade {
+    transition: all 0.3s ease;
+}
+
+.post-card:hover .content-fade {
+    color: #000 !important;
+}
+
+.bounce {
+    animation: bounce 2s infinite ease-in-out;
+}
+
+/* Add smooth page transitions */
+.container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Improve button hover effect */
+.btn-outline-primary {
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: var(--bs-primary);
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.btn-outline-primary:hover::before {
+    width: 100%;
+}
+
+.btn-outline-primary:hover {
+    color: white;
+}
+</style>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add intersection observer for smooth scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.animate-in').forEach(element => {
+        observer.observe(element);
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}
